@@ -1,0 +1,28 @@
+micronaut:
+  application:
+    name: keymanager
+
+grpc:
+  server:
+    port: ${GRPC_PORT:50051}
+    keep-alive-time: 1h
+    max-inbound-message-size: 1024
+
+datasources:
+  default:
+    url: ${MYSQL_SERVER:`jdbc:mysql://localhost:3306/keymanager?createDatabaseIfNotExist=true&useTimezone=true&serverTimezone=America/Sao_Paulo&useSSL=false&allowPublicKeyRetrieval=true`}
+    driverClassName: com.mysql.cj.jdbc.Driver
+    username: root
+    password: Root@12345
+    dialect: MYSQL
+jpa.default.properties.hibernate.hbm2ddl.auto: update
+
+jackson.serialization.writeDatesAsTimestamps: false
+
+itau:
+  contas:
+    url: ${ITAU_CLIENT_URL:`http://localhost:9091`}
+
+bcb:
+  pix:
+    url: ${BCB_CLIENT_URL:`http://localhost:8082`}

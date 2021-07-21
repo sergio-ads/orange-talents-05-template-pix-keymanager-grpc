@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "br.com.zupacademy.grpc";
+option java_outer_classname = "KeymanagerGRPC";
+
+package br.com.zupacademy;
+
+service KeymanagerRegistraGRPCService {
+  rpc registraGRPC(RegistraChavePixRequestGRPC) returns (RegistraChavePixResponseGRPC) {}
+}
+service KeymanagerRemoveGRPCService {
+  rpc removeGRPC(RemoveChavePixRequestGRPC) returns (RemoveChavePixResponseGRPC) {}
+}
+
+enum TipoDeChaveGRPC {
+  UNKNOWN_TIPO_CHAVE = 0;
+  CPF                = 1;
+  CELULAR            = 2;
+  EMAIL              = 3;
+  ALEATORIA          = 4;
+}
+
+enum TipoDeContaGRPC {
+  UNKNOWN_TIPO_CONTA = 0;
+  CONTA_CORRENTE     = 1;
+  CONTA_POUPANCA     = 2;
+}
+
+/**
+ * Registra chave
+ */
+message RegistraChavePixRequestGRPC {
+  string clienteId        = 1;
+  TipoDeChaveGRPC tipoDeChave = 2;
+  string chave            = 3;
+  TipoDeContaGRPC tipoDeConta = 4;
+}
+
+message RegistraChavePixResponseGRPC {
+  string clienteId = 1;
+  string pixId     = 2;
+}
+
+/**
+ * Remove chave
+ */
+message RemoveChavePixRequestGRPC {
+  string clienteId = 1;
+  string pixId     = 2;
+}
+
+message RemoveChavePixResponseGRPC {
+  string clienteId = 1;
+  string pixId     = 2;
+}
