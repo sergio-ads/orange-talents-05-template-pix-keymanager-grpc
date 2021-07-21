@@ -33,7 +33,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.Mockito
 import org.mockito.Mockito.`when`
-import org.mockito.kotlin.any
 import java.time.LocalDateTime
 import java.util.*
 import javax.inject.Inject
@@ -100,7 +99,7 @@ internal class RemoveChaveEndpointTest(
     @Test
     fun `deve informar erro ao remover do BCB`() {
         // Cenário
-        `when`(bcbClient.delete(Mockito.anyString(), any()))
+        `when`(bcbClient.delete(CHAVE_EXISTENTE.chave, deletePixKeyRequest()))
             .thenReturn(HttpResponse.notFound())
 
         // Executa
