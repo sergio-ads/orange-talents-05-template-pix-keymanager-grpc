@@ -6,6 +6,14 @@ option java_outer_classname = "KeymanagerGRPC";
 
 package br.com.zupacademy;
 
+import "google/protobuf/timestamp.proto";
+
+service KeymanagerListaGRPCService {
+  rpc listaGRPC(ListaChavePixRequestGRPC) returns (ListaChavePixResponseGRPC) {}
+}
+service KeymanagerConsultaGRPCService {
+  rpc consultaGRPC(ConsultaChavePixRequestGRPC) returns (ConsultaChavePixResponseGRPC) {}
+}
 service KeymanagerRegistraGRPCService {
   rpc registraGRPC(RegistraChavePixRequestGRPC) returns (RegistraChavePixResponseGRPC) {}
 }
@@ -28,6 +36,58 @@ enum TipoDeContaGRPC {
 }
 
 /**
+ * Listar chaves
+ */
+message ListaChavePixRequestGRPC {
+  string clienteId  = 1;
+}
+message ListaChavePixResponseGRPC {
+  message ChavePix {
+    string pixId                = 1;
+    TipoDeChaveGRPC tipo        = 2;
+    string chave                = 3;
+    TipoDeContaGRPC tipoDeConta = 4;
+    google.protobuf.Timestamp criadaEm = 5;
+  }
+
+  string clienteId         = 1;
+  repeated ChavePix chaves = 2;
+}
+
+/**
+ * Consulta chave
+ */
+message ConsultaChavePixRequestGRPC {
+  message FiltroPixId {
+    string clienteId  = 1;
+    string pixId      = 2;
+  }
+  oneof filtro {
+    FiltroPixId pixId = 1;
+    string chave      = 2;
+  }
+}
+message ConsultaChavePixResponseGRPC {
+  message ChavePix {
+    message ContaInfo {
+      TipoDeContaGRPC tipo = 1;
+      string instituicao   = 2;
+      string nomeDoTitular = 3;
+      string cpfDoTitular  = 4;
+      string agencia       = 5;
+      string numeroDaConta = 6;
+    }
+    TipoDeChaveGRPC tipo    = 1;
+    string chave            = 2;
+    ContaInfo conta         = 3;
+    google.protobuf.Timestamp criadaEm = 4;
+  }
+  string clienteId = 1;
+  string pixId     = 2;
+  ChavePix chave   = 3;
+}
+
+/**
  * Registra chave
  */
 message RegistraChavePixRequestGRPC {
@@ -36,7 +96,6 @@ message RegistraChavePixRequestGRPC {
   string chave            = 3;
   TipoDeContaGRPC tipoDeConta = 4;
 }
-
 message RegistraChavePixResponseGRPC {
   string clienteId = 1;
   string pixId     = 2;
@@ -49,7 +108,6 @@ message RemoveChavePixRequestGRPC {
   string clienteId = 1;
   string pixId     = 2;
 }
-
 message RemoveChavePixResponseGRPC {
   string clienteId = 1;
   string pixId     = 2;

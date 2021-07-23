@@ -1,4 +1,4 @@
-package br.com.zupacademy.endpoints
+package br.com.zupacademy.endpoint
 
 import br.com.zupacademy.consumer.bcb.BancoCentralClient
 import br.com.zupacademy.consumer.bcb.DeletePixKeyRequest
@@ -39,8 +39,8 @@ import javax.inject.Inject
 
 @MicronautTest(transactional = false)
 internal class RemoveChaveEndpointTest(
-    val repository: ChavePixRepository,
-    val grpcClient: KeymanagerRemoveGRPCServiceGrpc.KeymanagerRemoveGRPCServiceBlockingStub
+    private val repository: ChavePixRepository,
+    private val grpcClient: KeymanagerRemoveGRPCServiceGrpc.KeymanagerRemoveGRPCServiceBlockingStub
 ) {
 
     @Inject
@@ -117,7 +117,6 @@ internal class RemoveChaveEndpointTest(
         }
     }
 
-
     @Test
     fun `deve verificar erros de validacao`() {
         // Executa
@@ -166,7 +165,7 @@ internal class RemoveChaveEndpointTest(
 
     private fun chave(): ChavePix {
         return ChavePix( // Homenagem ao Tiago
-            clienteId = "bc35591d-b547-4151-a325-4a9d2cd19614",
+            clienteId = UUID.randomUUID().toString(),
             tipo = TipoDeChave.EMAIL,
             chave = "tiago.freitas@zup.com.br",
             tipoDeConta = TipoDeConta.CONTA_CORRENTE,

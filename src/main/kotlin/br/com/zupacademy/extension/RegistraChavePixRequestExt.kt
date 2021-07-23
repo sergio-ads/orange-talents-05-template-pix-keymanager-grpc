@@ -1,10 +1,11 @@
-package br.com.zupacademy.model.request
+package br.com.zupacademy.extension
 
 import br.com.zupacademy.grpc.RegistraChavePixRequestGRPC
 import br.com.zupacademy.grpc.TipoDeChaveGRPC.*
 import br.com.zupacademy.grpc.TipoDeContaGRPC.*
 import br.com.zupacademy.model.enums.TipoDeChave
 import br.com.zupacademy.model.enums.TipoDeConta
+import br.com.zupacademy.model.request.RegistraChavePixRequest
 
 fun RegistraChavePixRequestGRPC.toModel() : RegistraChavePixRequest {
     return RegistraChavePixRequest(

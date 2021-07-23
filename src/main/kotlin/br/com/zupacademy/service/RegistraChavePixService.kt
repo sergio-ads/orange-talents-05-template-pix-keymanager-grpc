@@ -4,7 +4,9 @@ import br.com.zupacademy.consumer.bcb.BancoCentralClient
 import br.com.zupacademy.consumer.bcb.CreatePixKeyRequest
 import br.com.zupacademy.consumer.itau.ItauContasClient
 import br.com.zupacademy.error.exceptions.ChavePixExistenteException
+import br.com.zupacademy.grpc.RegistraChavePixResponseGRPC
 import br.com.zupacademy.model.ChavePix
+import br.com.zupacademy.model.enums.TipoDeChave
 import br.com.zupacademy.model.request.RegistraChavePixRequest
 import br.com.zupacademy.repository.ChavePixRepository
 import io.micronaut.http.HttpStatus
@@ -26,7 +28,7 @@ class RegistraChavePixService(
     private val LOGGER = LoggerFactory.getLogger(this::class.java)
 
     @Transactional
-    fun registra(@Valid novaChave: RegistraChavePixRequest): ChavePix {
+    fun registra(@Valid novaChave: RegistraChavePixRequest): RegistraChavePixResponseGRPC {
 
         // 1. verifica se chave já existe no sistema
         if (repository.existsByChave(novaChave.chave))
@@ -41,6 +43,9 @@ class RegistraChavePixService(
         repository.save(chave)
 
         // 4. registra chave no BCB
+        if(chave.tipo == TipoDeChave.ALEATORIA)
+            chave.chave = ""
+
         val bcbRequest = CreatePixKeyRequest.of(chave).also {
             LOGGER.info("Registrando chave Pix no Banco Central do Brasil (BCB): ${it.key}")
         }
@@ -52,7 +57,10 @@ class RegistraChavePixService(
         // 5. atualiza chave do dominio com chave gerada pelo BCB
         chave.atualiza(bcbResponse.body()!!.key)
 
-        return chave
+        return RegistraChavePixResponseGRPC.newBuilder()
+            .setClienteId(chave.clienteId)
+            .setPixId(chave.id)
+            .build()
     }
 
 }

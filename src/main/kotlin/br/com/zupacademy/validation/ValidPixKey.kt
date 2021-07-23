@@ -48,30 +48,3 @@ class ValidPixKeyValidator: javax.validation.ConstraintValidator<ValidPixKey, Re
         return valid
     }
 }
-
-/**
- * IT'S NOT USED HERE
- *
- * It seems like Micronaut does NOT support Custom property paths, so we have to use Bean Validation API
- * directly instead
- *
- * - https://docs.micronaut.io/latest/guide/index.html#beanValidation
- * - https://docs.jboss.org/hibernate/stable/validator/reference/en-US/html_single/#section-custom-property-paths
- */
-class ValidPixKeyValidatorUsingMicronautSupport: ConstraintValidator<ValidPixKey, RegistraChavePixRequest> {
-
-    override fun isValid(
-        value: RegistraChavePixRequest?,
-        annotationMetadata: AnnotationValue<ValidPixKey>,
-        context: ConstraintValidatorContext,
-    ): Boolean {
-
-        // must be validated with @NotNull
-        if (value?.tipo == null) {
-            return true
-        }
-
-        return value.tipo.valida(value.chave)
-    }
-
-}

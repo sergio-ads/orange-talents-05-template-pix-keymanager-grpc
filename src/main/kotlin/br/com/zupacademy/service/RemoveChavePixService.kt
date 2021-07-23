@@ -3,16 +3,12 @@ package br.com.zupacademy.service
 import br.com.zupacademy.consumer.bcb.BancoCentralClient
 import br.com.zupacademy.consumer.bcb.DeletePixKeyRequest
 import br.com.zupacademy.error.exceptions.ChavePixNaoEncontradaException
-import br.com.zupacademy.grpc.KeymanagerRemoveGRPCServiceGrpc
-import br.com.zupacademy.grpc.RemoveChavePixRequestGRPC
 import br.com.zupacademy.grpc.RemoveChavePixResponseGRPC
 import br.com.zupacademy.repository.ChavePixRepository
 import br.com.zupacademy.validation.ValidUUID
-import io.grpc.stub.StreamObserver
 import io.micronaut.http.HttpStatus
 import io.micronaut.validation.Validated
 import org.slf4j.LoggerFactory
-import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 import javax.transaction.Transactional
@@ -30,7 +26,7 @@ class RemoveChavePixService(
     fun remove(
         @NotBlank @ValidUUID clienteId: String,
         @NotBlank @ValidUUID pixId: String
-    ) {
+    ): RemoveChavePixResponseGRPC {
         // 1. verifica se a chave existe no sistema
         val chave = repository.findByIdAndClienteId(pixId, clienteId)
             .orElseThrow {
@@ -49,5 +45,10 @@ class RemoveChavePixService(
         if (bcbResponse.status != HttpStatus.OK) {
             throw IllegalStateException("Erro ao remover chave pix no Banco Central do Brasil (BCB)")
         }
+
+        return RemoveChavePixResponseGRPC.newBuilder()
+            .setClienteId(clienteId)
+            .setPixId(pixId)
+            .build()
     }
 }

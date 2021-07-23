@@ -53,7 +53,7 @@ class ChavePix(
     /**
      * Verifica se esta chave pertence a este cliente
      */
-    fun pertenceAo(clienteId: UUID) = this.clienteId.equals(clienteId)
+    fun pertenceAo(clienteId: String) = this.clienteId == clienteId
 
     /**
      * Verifica se é chave uma aleatória

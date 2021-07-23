@@ -1,4 +1,4 @@
-package br.com.zupacademy.endpoints
+package br.com.zupacademy.endpoint
 
 import br.com.zupacademy.error.ErrorHandler
 import br.com.zupacademy.grpc.KeymanagerRemoveGRPCServiceGrpc
@@ -18,12 +18,9 @@ class RemoveChaveEndpoint(@Inject private val service: RemoveChavePixService)
         requestGRPC: RemoveChavePixRequestGRPC,
         responseObserver: StreamObserver<RemoveChavePixResponseGRPC>
     ) {
-        service.remove(requestGRPC.clienteId, requestGRPC.pixId)
+        val response = service.remove(requestGRPC.clienteId, requestGRPC.pixId)
 
-        responseObserver.onNext(RemoveChavePixResponseGRPC.newBuilder()
-            .setClienteId(requestGRPC.clienteId)
-            .setPixId(requestGRPC.pixId)
-            .build())
+        responseObserver.onNext(response)
         responseObserver.onCompleted()
     }
 

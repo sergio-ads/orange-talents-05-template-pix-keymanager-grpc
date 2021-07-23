@@ -5,7 +5,7 @@ import br.com.zupacademy.model.ContaAssociada
 import br.com.zupacademy.model.enums.Instituicoes
 import br.com.zupacademy.model.enums.TipoDeChave
 import br.com.zupacademy.model.enums.TipoDeConta
-import br.com.zupacademy.model.response.ChavePixResponse
+import io.micronaut.core.annotation.Introspected
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.MediaType
 import io.micronaut.http.annotation.*
@@ -33,7 +33,7 @@ interface BancoCentralClient {
 
     @Get("/api/v1/pix/keys/{key}",
         consumes = [MediaType.APPLICATION_XML])
-    fun findByKey(@PathVariable key: String): HttpResponse<PixKeyDetailsResponse>
+    fun findByKey(@PathVariable key: String): HttpResponse<FindPixKeyResponse>?
 
 }
 
@@ -50,57 +50,28 @@ data class DeletePixKeyResponse(
 
 data class CreatePixKeyRequest(
     val keyType: PixKeyType,
-    val key: String,
+    val key: String?,
     val bankAccount: BankAccount,
     val owner: Owner
 ) {
-
     companion object {
-
         fun of(chave: ChavePix): CreatePixKeyRequest {
             return CreatePixKeyRequest(
-                    keyType = PixKeyType.by(chave.tipo),
-                    key = chave.chave,
-                    bankAccount = BankAccount(
-                            participant = ContaAssociada.ITAU_UNIBANCO_ISPB,
-                            branch = chave.conta.agencia,
-                            accountNumber = chave.conta.numeroDaConta,
-                            accountType = BankAccount.AccountType.by(chave.tipoDeConta),
-                    ),
-                    owner = Owner(
-                            type = Owner.OwnerType.NATURAL_PERSON,
-                            name = chave.conta.nomeDoTitular,
-                            taxIdNumber = chave.conta.cpfDoTitular
-                    )
+                keyType = PixKeyType.by(chave.tipo),
+                key = chave.chave,
+                bankAccount = BankAccount(
+                        participant = ContaAssociada.ITAU_UNIBANCO_ISPB,
+                        branch = chave.conta.agencia,
+                        accountNumber = chave.conta.numeroDaConta,
+                        accountType = BankAccount.AccountType.by(chave.tipoDeConta),
+                ),
+                owner = Owner(
+                        type = Owner.OwnerType.NATURAL_PERSON,
+                        name = chave.conta.nomeDoTitular,
+                        taxIdNumber = chave.conta.cpfDoTitular
+                )
             )
         }
-    }
-}
-
-data class PixKeyDetailsResponse (
-    val keyType: PixKeyType,
-    val key: String,
-    val bankAccount: BankAccount,
-    val owner: Owner,
-    val createdAt: LocalDateTime
-) {
-
-    fun toModel(): ChavePixResponse {
-        return ChavePixResponse(
-            tipo = keyType.domainType!!,
-            chave = this.key,
-            tipoDeConta = when (this.bankAccount.accountType) {
-                    BankAccount.AccountType.CACC -> TipoDeConta.CONTA_CORRENTE
-                    BankAccount.AccountType.SVGS -> TipoDeConta.CONTA_POUPANCA
-                },
-            conta = ContaAssociada(
-                instituicao = Instituicoes.nome(bankAccount.participant),
-                nomeDoTitular = owner.name,
-                cpfDoTitular = owner.taxIdNumber,
-                agencia = bankAccount.branch,
-                numeroDaConta = bankAccount.accountNumber
-            )
-        )
     }
 }
 
@@ -111,6 +82,33 @@ data class CreatePixKeyResponse (
     val owner: Owner,
     val createdAt: LocalDateTime
 )
+
+data class FindPixKeyResponse (
+    val keyType: PixKeyType,
+    val key: String,
+    val bankAccount: BankAccount,
+    val owner: Owner,
+    val createdAt: LocalDateTime
+) {
+    fun toModel(): ChavePix {
+        return ChavePix(
+            clienteId = "",
+            tipo = keyType.domainType!!,
+            chave = this.key,
+            tipoDeConta = when (this.bankAccount.accountType) {
+                BankAccount.AccountType.CACC -> TipoDeConta.CONTA_CORRENTE
+                BankAccount.AccountType.SVGS -> TipoDeConta.CONTA_POUPANCA
+            },
+            conta = ContaAssociada(
+                instituicao = Instituicoes.nome(bankAccount.participant),
+                nomeDoTitular = owner.name,
+                cpfDoTitular = owner.taxIdNumber,
+                agencia = bankAccount.branch,
+                numeroDaConta = bankAccount.accountNumber
+            )
+        )
+    }
+}
 
 data class Owner(
     val type: OwnerType,
@@ -165,7 +163,7 @@ enum class PixKeyType(val domainType: TipoDeChave?) {
 
     companion object {
 
-        private val mapping = PixKeyType.values().associateBy(PixKeyType::domainType)
+        private val mapping = values().associateBy(PixKeyType::domainType)
 
         fun by(domainType: TipoDeChave): PixKeyType {
             return  mapping[domainType] ?: throw IllegalArgumentException("PixKeyType invalid or not found for $domainType")
