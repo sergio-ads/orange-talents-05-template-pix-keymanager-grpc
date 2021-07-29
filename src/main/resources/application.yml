@@ -10,11 +10,11 @@ grpc:
 
 datasources:
   default:
-    url: ${MYSQL_SERVER:`jdbc:mysql://localhost:3306/keymanager?createDatabaseIfNotExist=true&useTimezone=true&serverTimezone=America/Sao_Paulo&useSSL=false&allowPublicKeyRetrieval=true`}
-    driverClassName: com.mysql.cj.jdbc.Driver
-    username: root
-    password: Root@12345
-    dialect: MYSQL
+    url: ${DB_HOST:`jdbc:postgresql://localhost:5432/keymanager`}
+    username: ${DB_USER:root}
+    password: ${DB_PASS:Root@12345}
+    driverClassName: org.postgresql.Driver
+    dialect: POSTGRES
 jpa.default.properties.hibernate.hbm2ddl.auto: update
 
 jackson.serialization.writeDatesAsTimestamps: false

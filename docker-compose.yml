@@ -1,10 +1,44 @@
 version: '3'
 services:
+
+    postgres-pix:
+        image: 'postgres:alpine'
+        ports:
+            - 5432:5432
+        environment:
+            POSTGRES_USER: root
+            POSTGRES_PASSWORD: Root@12345
+            POSTGRES_DB: keymanager
+
+    keymanager-grpc:
+        image: orange-talents-05-template-pix-keymanager-grpc:latest
+        restart: on-failure
+        ports:
+            - 50051:50051
+        environment:
+            DB_HOST: jdbc:postgresql://postgres-pix:5432/keymanager
+            DB_USER: root
+            DB_PASS: Root@12345
+            ITAU_CLIENT_URL: http://erp-itau:9091
+            BCB_CLIENT_URL: http://bcb:8082
+        depends_on:
+            - postgres-pix
+
+    keymanager-rest:
+        image: orange-talents-05-template-pix-keymanager-rest:latest
+        restart: on-failure
+        ports:
+            - 8080:8080
+        environment:
+            KEY_MANAGER_ADDRESS: keymanager-grpc:50051
+        depends_on:
+            - postgres-pix
+
     bcb:
         image: "public.ecr.aws/d8b2x5c9/orange-stack-sat-bcb-pix"
-        ports: 
+        ports:
             - 8082:8082
     erp-itau:
         image: "public.ecr.aws/d8b2x5c9/orange-stack-sat-itau-erp"
-        ports: 
+        ports:
             - 9091:9091

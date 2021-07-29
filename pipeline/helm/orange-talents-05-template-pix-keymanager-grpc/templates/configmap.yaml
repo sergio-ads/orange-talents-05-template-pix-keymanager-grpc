@@ -1,0 +1,8 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: orange-talents-05-template-pix-keymanager-grpc-configmap
+data:
+  DB_HOST: "{{ .Values.application.DB_HOST }}"
+  ITAU_CLIENT_URL: "{{ .Values.application.ITAU_CLIENT_URL }}"
+  BCB_CLIENT_URL: "{{ .Values.application.BCB_CLIENT_URL }}"
